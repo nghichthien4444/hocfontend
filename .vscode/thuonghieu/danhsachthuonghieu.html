@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách thương hiệu</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: #f7f8fa;
+            margin: 0;
+            color: #222;
+        }
+        .sidebar {
+            width: 220px;
+            background: #fff;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            border-right: 1px solid #e5e7eb;
+            padding-top: 16px;
+            z-index: 10;
+        }
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 24px 24px 24px;
+        }
+        .sidebar .logo img {
+            width: 48px;
+            margin-right: 10px;
+        }
+        .sidebar nav {
+            margin-top: 10px;
+        }
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #222;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: background 0.2s;
+        }
+        .sidebar nav a.active, .sidebar nav a:hover {
+            background: #eaf1ff;
+            color: #2563eb;
+        }
+        .sidebar nav a .icon {
+            width: 20px;
+            margin-right: 12px;
+        }
+        .sidebar .settings {
+            position: absolute;
+            bottom: 24px;
+            width: 100%;
+        }
+        .sidebar .settings a {
+            color: #2563eb;
+        }
+        .main {
+            margin-left: 240px;
+            padding: 32px 40px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .header .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .header .user {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header .user .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #2563eb;
+        }
+        .header .user .name {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .header .add-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .header .add-btn:hover {
+            background: #174bbd;
+        }
+        .search-bar {
+            margin-bottom: 18px;
+        }
+        .search-bar input {
+            width: 340px;
+            padding: 10px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .table-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 0;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.98rem;
+        }
+        thead {
+            background: #f3f4f6;
+        }
+        th, td {
+            padding: 14px 10px;
+            text-align: left;
+        }
+        th {
+            font-weight: 500;
+            color: #6b7280;
+        }
+        tbody tr {
+            border-bottom: 1px solid #f1f1f1;
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        .brand-link {
+            color: #2563eb;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .desc {
+            color: #6b7280;
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .catalog-icon {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #2563eb;
+            font-size: 0.95em;
+        }
+        .status {
+            font-weight: 500;
+        }
+        .status.active {
+            color: #22c55e;
+        }
+        .status.inactive {
+            color: #f59e42;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 38px;
+            height: 22px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #e5e7eb;
+            border-radius: 22px;
+            transition: .3s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        input:checked + .slider {
+            background-color: #2563eb;
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+        .pagination {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+            margin: 18px 0 0 0;
+        }
+        .pagination button {
+            border: none;
+            background: #e5e7eb;
+            color: #222;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .pagination button.active, .pagination button:hover {
+            background: #2563eb;
+            color: #fff;
+        }
+        @media (max-width: 1100px) {
+            .main { padding: 24px 8px; }
+            .sidebar { width: 180px; }
+            .main { margin-left: 200px; }
+        }
+        @media (max-width: 800px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 12px 2vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="https://i.imgur.com/4M7IWwP.png" alt="Logo" />
+            <div>
+                <div style="font-weight:700;color:#2563eb;">Hồng Anh Computer</div>
+                <div style="font-size:12px;color:#6b7280;">Hệ thống quản lý bán hàng</div>
+            </div>
+        </div>
+        <nav>
+            <a href="#"><span class="icon">🏠</span> Tổng quan</a>
+            <a href="#"><span class="icon">🧾</span> Đơn hàng</a>
+            <a href="#" class="active"><span class="icon">📦</span> Sản phẩm</a>
+            <a href="#"><span class="icon">🏷️</span> Quản lý thương hiệu</a>
+            <a href="#"><span class="icon">🛒</span> Giỏ hàng</a>
+            <a href="#"><span class="icon">📦</span> Tồn kho</a>
+            <a href="#"><span class="icon">🏪</span> Đại lý</a>
+            <a href="#"><span class="icon">💰</span> Kế toán</a>
+            <a href="#"><span class="icon">🔢</span> Serial</a>
+            <a href="#"><span class="icon">💳</span> Công nợ</a>
+            <a href="#"><span class="icon">💵</span> Sổ quỹ</a>
+            <a href="#"><span class="icon">📊</span> Báo cáo</a>
+        </nav>
+        <div class="settings">
+            <a href="#"><span class="icon">⚙️</span> Cài đặt</a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <div>
+                <div class="title">Danh sách thương hiệu</div>
+                <div style="font-size:14px;color:#6b7280;margin-top:2px;">Sản phẩm / Danh sách thương hiệu</div>
+            </div>
+            <div class="user">
+                <span class="avatar">G</span>
+                <span class="name">GiangNH<br><span style="font-size:12px;color:#6b7280;font-weight:400;">Nhân viên kinh doanh</span></span>
+                <button class="add-btn">Thêm mới</button>
+            </div>
+        </div>
+        <div class="search-bar">
+            <input type="text" placeholder="Tìm kiếm theo tên thương hiệu">
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>TÊN THƯƠNG HIỆU</th>
+                        <th>MÔ TẢ</th>
+                        <th>SỐ LƯỢNG SẢN PHẨM</th>
+                        <th>CATALOG ĐÍNH KÈM</th>
+                        <th>TRẠNG THÁI</th>
+                        <th>HÀNH ĐỘNG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>0</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>156</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>3000</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>0</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>134</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status inactive">Ngưng hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>0</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>123</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status active">Đang hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td><a href="#" class="brand-link">Samsung</a></td>
+                        <td class="desc">Sau hơn 50 năm, chúng tôi vẫn tiếp tục đổi mới và tạo ra công nghệ phá vỡ những rào cản cũ và mới, đồng thời giữ...</td>
+                        <td>321</td>
+                        <td><span class="catalog-icon"> <img src="https://img.icons8.com/color/24/000000/ms-word.png" width="20" alt="Word"/> Catalog</span></td>
+                        <td><span class="status inactive">Ngưng hoạt động</span></td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div style="font-size:13px;color:#6b7280;margin-top:10px;">
+            Hiển thị 1 - 8 của 24 (3 trang)
+        </div>
+        <div class="pagination">
+            <button>1</button>
+            <button class="active">2</button>
+            <button>3</button>
+            <button>&gt;</button>
+            <button>&gt;|</button>
+        </div>
+    </div>
+</body>
+</html>
